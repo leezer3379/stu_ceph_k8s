@@ -164,21 +164,99 @@ vagrant ssh ceph-node-1
 cd /vagrant/ansible
 ansible-playbook -i hosts.yaml install.yaml
 
+[root@ceph-node-1 ansible]# ansible-playbook -i hosts.yaml install.yaml -C
+ [WARNING]: Found both group and host with same name: ceph-client
+
+
+PLAY [安装ceph-deploy] *******************************************************************************************************************************************************************************************************************************************
+
+TASK [ceph-deploy : 安装ceph-deploy] *****************************************************************************************************************************************************************************************************************************
+ok: [ceph-node-1]
+
+TASK [ceph-deploy : 替换配置文件] ************************************************************************************************************************************************************************************************************************************
+ok: [ceph-node-1]
+
+TASK [ceph-deploy : 创建目录] **************************************************************************************************************************************************************************************************************************************
+changed: [ceph-node-1] => (item=/ect/ceph)
+
+TASK [ceph-deploy : change the user root password] *************************************************************************************************************************************************************************************************************
+skipping: [ceph-node-1]
+
+PLAY [安装ceph] **************************************************************************************************************************************************************************************************************************************************
+
+TASK [install-ceph : 安装ceph前的工作] *******************************************************************************************************************************************************************************************************************************
+skipping: [ceph-node-1] => (item=yum clean all) 
+skipping: [ceph-node-1] => (item=yum -y install epel-release) 
+skipping: [ceph-node-1] => (item=yum -y install yum-plugin-priorities) 
+skipping: [ceph-node-1] => (item=rpm --import https://download.ceph.com/keys/release.asc) 
+skipping: [ceph-node-1] => (item=yum remove -y ceph-release) 
+skipping: [ceph-node-1] => (item=yum install -y https://download.ceph.com/rpm-jewel/el7/noarch/ceph-release-1-0.el7.noarch.rpm) 
+skipping: [ceph-node-1] => (item=yum -y install ceph ceph-radosgw) 
+
+TASK [install-ceph : 安装ceph] ***********************************************************************************************************************************************************************************************************************************
+skipping: [ceph-node-1]
+
+PLAY [创建监控] ****************************************************************************************************************************************************************************************************************************************************
+
+TASK [install_mon : 创建第一个监控 monitor] ***************************************************************************************************************************************************************************************************************************
+skipping: [ceph-node-1]
+
+TASK [install_mon : 创建mon slave] *******************************************************************************************************************************************************************************************************************************
+skipping: [ceph-node-1] => (item=ceph-node-2) 
+skipping: [ceph-node-1] => (item=ceph-node-3) 
+
+PLAY [创建osd] ***************************************************************************************************************************************************************************************************************************************************
+
+TASK [create_osd : 创建osd] **************************************************************************************************************************************************************************************************************************************
+skipping: [ceph-node-1] => (item=ssh ceph-node-1 mkdir /sd{b,c,d}) 
+skipping: [ceph-node-1] => (item=ssh ceph-node-1 chown ceph:ceph /sd{b,c,d}) 
+skipping: [ceph-node-1] => (item=ssh ceph-node-2 mkdir /sd{b,c,d}) 
+skipping: [ceph-node-1] => (item=ssh ceph-node-2 chown ceph:ceph /sd{b,c,d}) 
+skipping: [ceph-node-1] => (item=ssh ceph-node-3 mkdir /sd{b,c,d}) 
+skipping: [ceph-node-1] => (item=ssh ceph-node-3 chown ceph:ceph /sd{b,c,d}) 
+skipping: [ceph-node-1] => (item=ceph-deploy osd create ceph-node-1:/sd{b,c,d}) 
+skipping: [ceph-node-1] => (item=ceph-deploy osd activate ceph-node-1:/sd{b,c,d}) 
+skipping: [ceph-node-1] => (item=ceph-deploy osd create ceph-node-2:/sd{b,c,d}) 
+skipping: [ceph-node-1] => (item=ceph-deploy osd activate ceph-node-2:/sd{b,c,d}) 
+skipping: [ceph-node-1] => (item=ceph-deploy osd create ceph-node-3:/sd{b,c,d}) 
+skipping: [ceph-node-1] => (item=ceph-deploy osd activate ceph-node-3:/sd{b,c,d}) 
+
+TASK [create_osd : 调整rbd] **************************************************************************************************************************************************************************************************************************************
+skipping: [ceph-node-1] => (item=ceph osd pool set rbd pg_num 256) 
+skipping: [ceph-node-1] => (item=ceph osd pool set rbd pgp_num 256) 
+
+PLAY [创建mds（cephfs 需要）] ****************************************************************************************************************************************************************************************************************************************
+
+TASK [ceph_mds : 创建MDS] ****************************************************************************************************************************************************************************************************************************************
+skipping: [ceph-node-1] => (item=ceph-deploy --overwrite-conf mds create ceph-node-2) 
+
+PLAY RECAP *****************************************************************************************************************************************************************************************************************************************************
+ceph-node-1                : ok=3    changed=1    unreachable=0    failed=0   
+
+[root@ceph-node-1 ansible]# ceph -s 
+    cluster 2db65bac-9084-4872-98e3-494036408403
+     health HEALTH_OK
+     monmap e3: 3 mons at {ceph-node-1=192.168.100.105:6789/0,ceph-node-2=192.168.100.106:6789/0,ceph-node-3=192.168.100.107:6789/0}
+            election epoch 62, quorum 0,1,2 ceph-node-1,ceph-node-2,ceph-node-3
+      fsmap e22: 1/1/1 up {0=ceph-node-2=up:active}
+     osdmap e158: 9 osds: 9 up, 9 in
+            flags sortbitwise,require_jewel_osds
+      pgmap v103054: 896 pgs, 5 pools, 1893 MB data, 575 objects
+            165 GB used, 203 GB / 368 GB avail
+                 896 active+clean
+[root@ceph-node-1 ansible]# 
+
 安装完成ceph 集群就建立起来了， 就可以按照装文档操作了
 ```
-```angular2html
-git remotls
-
-git remots
-
+```
 git init
-
 
 git remote add .
 git commit -m "second commit"
 git remote add origin https://github.com/leezer3379/stu_ceph_k8s.git
 
 git remote push -u origin master
+
 ```
 
 ### 其他文档
