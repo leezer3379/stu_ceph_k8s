@@ -31,7 +31,8 @@
 
 (直接去官网下载安装即可)
 ```
-下载Centos www.vagrantbox.es可以在这里参考
+下载Centos 可以在这里参考
+- www.vagrantbox.es 
 
 
 #### 安装方法请看官网 https://github.com/hashicorp/vagrant
@@ -270,14 +271,16 @@ tmpfs                   tmpfs      52M     0   52M   0% /run/user/0
 ```angular2html
 git remotls
 
-git remotgit init
+git remots
+
+git init
 
 
-git remote adadd .
-git remotgit commit -m "second commit"
+git remote add .
+git commit -m "second commit"
 git remote add origin https://github.com/leezer3379/stu_ceph_k8s.git
 
-git remote adpush -u origin master
+git remote push -u origin master
 ```
 ## 其他文档
 1. ceph 安装文档
