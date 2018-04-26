@@ -1,27 +1,26 @@
 # vagrant 部署 虚拟机初始化 测试环境
 #### 参考文档 : http://note.youdao.com/noteshare?id=a7ecfa92e92c46db3d1babb86dcc66a3
-# github
 
-## 介绍
+### 介绍
 
 本项目通过 vagrant 自动化脚本完成，测试环境部署，降低安装成本，提高生产效率
 
-## 配置介绍
+### 配置介绍
 
-**Ansible 实验环境**
-|     IP        |   username    |
-| ------------- |:-------------:|
-| 192.168.100.104 | node-4 |
-| 192.168.100.105 | node-5 |
+** Ansible 实验环境 **
+|     IP          |   username  |
+| -------------   |-------------|
+| 192.168.100.104 | node-4      |
+| 192.168.100.105 | node-5      |
 
-## 快速体验
+### 快速体验
 
 **软件版本**
 
-| 软件名称        | 版本        |
-| ------------- |:-------------:|
+| 软件名称     | 版本          |
+| -------------|-------------  |
 | ansible      | pip3 安装 升级|
-| python3      |   python3.6.3|
+| python3      | python3.6.3   |
 
 ## 安装 vagrant 安装virtualbox
 ```
@@ -247,8 +246,7 @@ ceph-node-1                : ok=3    changed=1    unreachable=0    failed=0
 [root@ceph-node-1 ansible]# 
 
 安装完成ceph 集群就建立起来了， 就可以按照装文档操作了
-```
-```
+
 git init
 
 git remote add .
