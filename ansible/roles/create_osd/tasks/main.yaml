@@ -1,0 +1,13 @@
+- name: 创建osd
+  become: true
+  shell: "cd /etc/ceph/ && {{item}}"
+  with_items:
+  - "{{create_osd_dir}}"
+  when: lb_role == "master"
+
+- name: 调整rbd
+  become: true
+  shell: "{{item}}"
+  with_items:
+  - "{{ceph_set_pool_cmd_list}}"
+  when: lb_role == "master"

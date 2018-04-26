@@ -1,0 +1,39 @@
+- name: "安装ceph-deploy"
+  gather_facts: no
+  hosts: ceph-deploy
+  roles:
+  - { role: ceph-deploy }
+  tags:
+  - ceph-deploy
+
+- name: "安装ceph"
+  gather_facts: no
+  hosts: ceph
+  roles:
+  - install-ceph
+  tags:
+  - install-ceph
+
+- name: "创建监控"
+  gather_facts: no
+  hosts: ceph-deploy
+  roles:
+  - install_mon
+  tags:
+  - install_mon
+
+- name: "创建osd"
+  gather_facts: no
+  hosts: ceph-deploy
+  roles:
+  - create_osd
+  tags:
+  - create_osd
+
+- name: "创建mds（cephfs 需要）"
+  gather_facts: no
+  hosts: ceph-deploy
+  roles:
+  - ceph_mds
+  tags:
+  - ceph_mds

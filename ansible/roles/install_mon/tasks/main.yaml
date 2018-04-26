@@ -1,0 +1,11 @@
+- name: 创建第一个监控 monitor
+  become: true
+  shell: "cd /etc/ceph/ && ceph-deploy mon create-initial"
+  when: lb_role == "master"
+
+- name: 创建mon slave
+  become: true
+  shell: "cd /etc/ceph/ && ceph-deploy mon create {{item}}"
+  with_items:
+  - "{{ceph_mon_list}}"
+  when: lb_role == "master"

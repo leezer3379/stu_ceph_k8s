@@ -1,0 +1,7 @@
+- name: 创建MDS
+  become: true
+  shell: "cd /etc/ceph/ && {{item}}"
+  with_items:
+  - "ceph-deploy --overwrite-conf mds create ceph-node-2"
+  when: lb_role == "master"
+

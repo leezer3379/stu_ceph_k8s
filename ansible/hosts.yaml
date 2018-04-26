@@ -1,0 +1,20 @@
+all:
+  children:
+    ceph-deploy:
+      hosts:
+        ceph-node-1:
+    ceph-client:
+      hosts:
+        ceph-client:
+    ceph:
+      hosts:
+        ceph-node-1:
+    mon:
+      hosts:
+        ceph-node-1:
+    osd:
+      hosts:
+        ceph-node-1:
+    ceph-mds:
+      hosts:
+        ceph-node-1:

@@ -1,5 +1,5 @@
 # vagrant 部署 虚拟机初始化 测试环境
-## 参考文档 ++http://note.youdao.com/noteshare?id=a7ecfa92e92c46db3d1babb86dcc66a3++
+#### 参考文档 : http://note.youdao.com/noteshare?id=a7ecfa92e92c46db3d1babb86dcc66a3
 # github
 
 ## 介绍

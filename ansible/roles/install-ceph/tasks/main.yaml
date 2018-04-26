@@ -1,0 +1,12 @@
+- name: 安装ceph前的工作
+  become: true
+  shell: "{{item}}"
+  with_items:
+    - "{{ceph_install_cmd}}"
+  when: lb_role == "master"
+
+- name: 安装ceph
+  become: true
+  shell: "cd /etc/ceph/ && ceph-deploy install ceph-node-1 ceph-node-2 ceph-node-3"
+  when: lb_role == "master"
+

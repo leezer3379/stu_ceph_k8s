@@ -1,0 +1,3 @@
+node_name: ceph-node-3
+node_ip: 192.168.100.107
+lb_role: ceph

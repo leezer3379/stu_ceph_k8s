@@ -1,0 +1,39 @@
+ceph_deploy_dir: /ect/ceph
+
+# 增加磁盘
+create_osd_dir:
+- "ssh ceph-node-1 mkdir /sd{b,c,d}"
+- "ssh ceph-node-1 chown ceph:ceph /sd{b,c,d}"
+- "ssh ceph-node-2 mkdir /sd{b,c,d}"
+- "ssh ceph-node-2 chown ceph:ceph /sd{b,c,d}"
+- "ssh ceph-node-3 mkdir /sd{b,c,d}"
+- "ssh ceph-node-3 chown ceph:ceph /sd{b,c,d}"
+- "ceph-deploy osd create ceph-node-1:/sd{b,c,d}"
+- "ceph-deploy osd activate ceph-node-1:/sd{b,c,d}"
+- "ceph-deploy osd create ceph-node-2:/sd{b,c,d}"
+- "ceph-deploy osd activate ceph-node-2:/sd{b,c,d}"
+- "ceph-deploy osd create ceph-node-3:/sd{b,c,d}"
+- "ceph-deploy osd activate ceph-node-3:/sd{b,c,d}"
+
+ceph_set_pool_cmd_list:
+- "ceph osd pool set rbd pg_num 256"
+- "ceph osd pool set rbd pgp_num 256"
+
+
+osd_dir_list:
+- /sdb
+- /sdc
+- /sdd
+
+ceph_install_cmd:
+- "yum clean all"
+- "yum -y install epel-release"
+- "yum -y install yum-plugin-priorities"
+- "rpm --import https://download.ceph.com/keys/release.asc"
+- "yum remove -y ceph-release"
+- "yum install -y https://download.ceph.com/rpm-jewel/el7/noarch/ceph-release-1-0.el7.noarch.rpm"
+- "yum -y install ceph ceph-radosgw"
+
+ceph_mon_list:
+- "ceph-node-2"
+- "ceph-node-3"
