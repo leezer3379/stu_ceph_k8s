@@ -74,9 +74,14 @@ vagrant init # 生成Vagrantfile文件
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-vms = {"192.168.100.104" => "node-4",
-       "192.168.100.105" => "node-5",}
-### Vagrantfile 内容
+vms = {
+       "192.168.100.105" => "ceph-node-1",
+       "192.168.100.106" => "ceph-node-2",
+       "192.168.100.107" => "ceph-node-3",
+
+       "192.168.100.108" => "ceph-client",
+       }
+
 
 Vagrant.configure("2") do |config|
     vms.each do |vm_ip, vm_name|
@@ -93,7 +98,7 @@ Vagrant.configure("2") do |config|
             node.vm.network "private_network", ip: vm_ip
             # config.vm.network "public_network"
             # 挂在目录 默认当前执行 vagrant 的目录
-            # config.vm.synced_folder "../data", "/vagrant_data"=
+            # config.vm.synced_folder "../data", "/vagrant_data"
             # 设置虚拟机的 名称， 内存 ，cpu，是否有GUI界面
             node.vm.provider "virtualbox" do |vb|
                 vb.customize ["modifyvm", :id, "--name", vm_name, "--memory", "512", "--cpus", "1"]
@@ -127,8 +132,11 @@ Vagrant.configure("2") do |config|
                 for i in "#{vms.map{|k,v|"#{k}    #{v}"}.join('" "')}";do echo $i>>/etc/hosts;done
 
                 sed -i '1d' /etc/hosts
+                # admin-node 执行
+                if [ "ceph-node1" == "#{vm_name}" ];then sudo echo "Host node1\n   Hostname node1\n   User ifnoelse\nHost node2\n   Hostname node2\n   User ifnoelse\nHost node3\n   Hostname node3\n   User ifnoelse\nHost ceph-client\n   Hostname ceph-client\n   User ifnoelse">/home/ifnoelse/.ssh/config;sudo chown -R ifnoelse:ifnoelse /home/ifnoelse;fi
                 # 判断node-4 安装特殊的东西
-                if [ "node-4" == "#{vm_name}" ];then yum install -y ansible;pip3 install --upgrade pip -i https://pypi.douban.com/simple/;sudo pip3 install ansible  -i https://pypi.douban.com/simple/;ln -s /usr/local/python3/bin/ansible  /usr/bin/ansible;fi
+
+                #if [ "node-4" == "#{vm_name}" ];then yum install -y ansible;pip3 install --upgrade pip -i https://pypi.douban.com/simple/;sudo pip3 install ansible  -i https://pypi.douban.com/simple/;ln -s /usr/local/python3/bin/ansible  /usr/bin/ansible;fi
 
             #   apt-get update
             #   apt-get install -y apache2
@@ -136,138 +144,28 @@ Vagrant.configure("2") do |config|
         end
     end
 end
-
-
-
-
-
-
+```
+### 启动
+```
+vagrant up
 ```
 
-## 执行
 
 vagrant up 启动虚拟机等待完毕后就可以看到两台虚拟机了
-![image](https://note.youdao.com/yws/public/resource/f4adbece08d04ad79f5f68e97177f7ce/xmlnote/3497AB23EC4A4A2EA3182615CB5AE758/5108)
+![image](https://note.youdao.com/yws/public/resource/f4adbece08d04ad79f5f68e97177f7ce/xmlnote/9CE0FFA9117E493EB37182EF78A3CD8E/5984)
 
+
+### 查看结果验证
+![image](https://note.youdao.com/yws/public/resource/f4adbece08d04ad79f5f68e97177f7ce/xmlnote/FAEF09FB83AE4234BB43DF4E891A7739/5118)
 ## 进入主机
 
 ```
-vagrant ssh node-4
+vagrant ssh ceph-node-1
+cd /vagrant/ansible
+ansible-playbook -i hosts.yaml install.yaml
+
+安装完成ceph 集群就建立起来了， 就可以按照装文档操作了
 ```
-### 查看结果验证
-![image](https://note.youdao.com/yws/public/resource/f4adbece08d04ad79f5f68e97177f7ce/xmlnote/FAEF09FB83AE4234BB43DF4E891A7739/5118)
-
-# 安装CephFS 
-### 其实就是安装 MDS
-
-```
-要为Ceph 文件系统配置元数据MDS
-
-安装mds
-[root@ceph-node-1 ceph]# ceph-deploy --overwrite-conf mds create ceph-node-2
-[ceph_deploy.conf][DEBUG ] found configuration file at: /root/.cephdeploy.conf
-[ceph_deploy.cli][INFO  ] Invoked (1.5.39): /usr/bin/ceph-deploy --overwrite-conf mds create ceph-node-2
-[ceph_deploy.cli][INFO  ] ceph-deploy options:
-[ceph_deploy.cli][INFO  ]  username                      : None
-[ceph_deploy.cli][INFO  ]  verbose                       : False
-[ceph_deploy.cli][INFO  ]  overwrite_conf                : True
-[ceph_deploy.cli][INFO  ]  subcommand                    : create
-[ceph_deploy.cli][INFO  ]  quiet                         : False
-[ceph_deploy.cli][INFO  ]  cd_conf                       : <ceph_deploy.conf.cephdeploy.Conf instance at 0x17248c0>
-[ceph_deploy.cli][INFO  ]  cluster                       : ceph
-[ceph_deploy.cli][INFO  ]  func                          : <function mds at 0x16c35f0>
-[ceph_deploy.cli][INFO  ]  ceph_conf                     : None
-[ceph_deploy.cli][INFO  ]  mds                           : [('ceph-node-2', 'ceph-node-2')]
-[ceph_deploy.cli][INFO  ]  default_release               : False
-[ceph_deploy.mds][DEBUG ] Deploying mds, cluster ceph hosts ceph-node-2:ceph-node-2
-[ceph-node-2][DEBUG ] connected to host: ceph-node-2 
-[ceph-node-2][DEBUG ] detect platform information from remote host
-[ceph-node-2][DEBUG ] detect machine type
-[ceph_deploy.mds][INFO  ] Distro info: CentOS Linux 7.4.1708 Core
-[ceph_deploy.mds][DEBUG ] remote host will use systemd
-[ceph_deploy.mds][DEBUG ] deploying mds bootstrap to ceph-node-2
-[ceph-node-2][DEBUG ] write cluster configuration to /etc/ceph/{cluster}.conf
-[ceph-node-2][DEBUG ] create path if it doesn't exist
-[ceph-node-2][INFO  ] Running command: ceph --cluster ceph --name client.bootstrap-mds --keyring /var/lib/ceph/bootstrap-mds/ceph.keyring auth get-or-create mds.ceph-node-2 osd allow rwx mds allow mon allow profile mds -o /var/lib/ceph/mds/ceph-ceph-node-2/keyring
-[ceph-node-2][INFO  ] Running command: systemctl enable ceph-mds@ceph-node-2
-[ceph-node-2][WARNIN] Created symlink from /etc/systemd/system/ceph-mds.target.wants/ceph-mds@ceph-node-2.service to /usr/lib/systemd/system/ceph-mds@.service.
-[ceph-node-2][INFO  ] Running command: systemctl start ceph-mds@ceph-node-2
-[ceph-node-2][INFO  ] Running command: systemctl enable ceph.target
-
-# 查询状态
-[root@ceph-node-1 ceph]# ssh ceph-node-2 systemctl  status ceph-mds@ceph-node-2
-● ceph-mds@ceph-node-2.service - Ceph metadata server daemon
-   Loaded: loaded (/usr/lib/systemd/system/ceph-mds@.service; enabled; vendor preset: disabled)
-   Active: active (running) # 状态 # since Mon 2018-04-23 13:34:20 CST; 6min ago
- Main PID: 1945 (ceph-mds)
-   CGroup: /system.slice/system-ceph\x2dmds.slice/ceph-mds@ceph-node-2.service
-           └─1945 /usr/bin/ceph-mds -f --cluster ceph --id ceph-node-2 --setuser ceph --setgroup ceph
-
-Apr 23 13:34:20 ceph-node-2 systemd[1]: Started Ceph metadata server daemon.
-Apr 23 13:34:20 ceph-node-2 systemd[1]: Starting Ceph metadata server daemon...
-Apr 23 13:34:20 ceph-node-2 ceph-mds[1945]: starting mds.ceph-node-2 at :/0
-```
-
-### 创建文件系统和元数据存储池
-
-```
-# ceph osd pool create cephfs_data 64 64
-# ceph osd pool create cephfs_metadata 64 64 
-```
-### 设置MDS为活跃状态，CephFS 也将处于可用状态：
-
-```
-# ceph fs new cephfs cephfs_metadata cephfs_data
-```
-#### 验证一下
-
-
-```
-ceph mds stat
-ceph fs ls
-
-```
-
-### 创建客户点CephFS 秘钥
-
-
-```
-ceph auth get-or-create client.cephfs mon 'allow r' osd 'allow rwx pool=cephfs_metadata, allow rwx pool=cephfs_data' -o /etc/ceph/client.cephfs.keyring
-
-ceph-authtool -p -n client.cephfs /etc/ceph/client.cephfs.keyring >/etc/ceph/client.cephfs
-
-
-[root@ceph-node-1 ceph]# cat /etc/ceph/client.cephfs
-```
-
-
-### 通过内核驱动访问CephFs
-
-```
-创建一个挂载点
-mkdir /mnt/cephfs
-ceph auth get-key client.cephfs
-AQDBc91ammPZARAALkK1PwKet0iKtXgOY+eBQw==
-
-# 但是发现以上这个key不好用权限太小不知道为什么
-还是直接暴力的使用admin的key吧
-mount -t ceph ceph-node-1:6789:/ /mnt/cephfs -o name=admin,secret=AQCiNthaDgQzIhAAwIUL8nbVaZsfeD1BolepBw== 
-[root@ceph-client ~]# df -TH
-Filesystem              Type      Size  Used Avail Use% Mounted on
-/dev/mapper/centos-root xfs        44G  2.0G   43G   5% /
-devtmpfs                devtmpfs  246M     0  246M   0% /dev
-tmpfs                   tmpfs     257M     0  257M   0% /dev/shm
-tmpfs                   tmpfs     257M   13M  244M   6% /run
-tmpfs                   tmpfs     257M     0  257M   0% /sys/fs/cgroup
-/dev/mapper/centos-home xfs        22G   34M   22G   1% /home
-/dev/sda1               xfs       1.1G  160M  904M  16% /boot
-vagrant                 vboxsf    251G  195G   57G  78% /vagrant
-/dev/rbd0               xfs        11G  444M   11G   5% /mnt/ceph-disk1
-tmpfs                   tmpfs      52M     0   52M   0% /run/user/0
-192.168.100.105:6789:/  ceph      396G  170G  226G  43% /mnt/cephfs
-```
-
-
 ```angular2html
 git remotls
 
@@ -282,7 +180,8 @@ git remote add origin https://github.com/leezer3379/stu_ceph_k8s.git
 
 git remote push -u origin master
 ```
-## 其他文档
+
+### 其他文档
 1. ceph 安装文档
 2. Ceph RBD 集成k8s
 3. CephFS 集成k8s
